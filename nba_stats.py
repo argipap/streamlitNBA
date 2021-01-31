@@ -53,12 +53,19 @@ def load_data(year: str, stat_type: str):
 
 playerstats = load_data(selected_year, DataUtils.get_stat_type(selected_category))
 
+# Sidebar - Player selection
+sorted_unique_players = sorted(playerstats.Player.unique())
+options = sorted_unique_players.append("All")
+selected_player = st.sidebar.multiselect("Player", sorted_unique_players, ["All"])
+if "All" in selected_player:
+    selected_player = sorted_unique_players
+
 # Sidebar - Team selection
-sorted_unique_team = sorted(playerstats.Tm.unique())
-options = sorted_unique_team.append("All")
-selected_team = st.sidebar.multiselect("Team", sorted_unique_team, ["All"])
+sorted_unique_teams= sorted(playerstats.Tm.unique())
+options = sorted_unique_teams.append("All")
+selected_team = st.sidebar.multiselect("Team", sorted_unique_teams, ["All"])
 if "All" in selected_team:
-    selected_team = sorted_unique_team
+    selected_team = sorted_unique_teams
 
 # Sidebar - Position selection
 unique_pos = ["C", "PF", "SF", "PG", "SG"]
@@ -67,21 +74,24 @@ selected_pos = st.sidebar.multiselect("Position", unique_pos, ["All"])
 if "All" in selected_pos:
     selected_pos = unique_pos
 
+
 # Filtering data
-df_selected_team = playerstats[
-    (playerstats.Tm.isin(selected_team)) & (playerstats.Pos.isin(selected_pos))
+df_selection = playerstats[
+    (playerstats.Tm.isin(selected_team)) &
+    (playerstats.Pos.isin(selected_pos)) &
+    (playerstats.Player.isin(selected_player))
 ]
-st.header(f"Display {selected_category} player stats according to filtering criteria")
+st.header(f"Display season player(s) stats according to filtering criteria")
 st.write(
     "Data Dimension: "
-    + str(df_selected_team.shape[0])
+    + str(df_selection.shape[0])
     + " rows and "
-    + str(df_selected_team.shape[1])
+    + str(df_selection.shape[1])
     + " columns."
 )
-st.dataframe(df_selected_team)
+st.dataframe(df_selection)
 
 st.markdown(
-    ExportUtils.export_to_csv(df_selected_team, selected_category, selected_year),
+    ExportUtils.export_to_csv(df_selection, selected_category, selected_year),
     unsafe_allow_html=True,
 )
