@@ -22,7 +22,7 @@ st.markdown(
 st.sidebar.header("Filtering")
 selected_year = st.sidebar.selectbox(
     "Year",
-    list(reversed([str(year) + "-" + str(year + 1) for year in range(1980, 2021)])),
+    list(reversed([str(year) + "-" + str(year + 1) for year in range(1980, DataUtils.get_season_year())])),
 )
 selected_category = st.sidebar.selectbox("Stats", ("Avg", "Total"))
 

@@ -1,5 +1,6 @@
 # utils/data_utils.py
 
+from datetime import datetime
 import pandas as pd
 from typing import List, Dict
 
@@ -53,3 +54,11 @@ class DataUtils:
     def get_stat_type(selected_category: str) -> str:
         stat_type = "_per_game" if selected_category == "Avg" else "_totals"
         return stat_type
+
+    @staticmethod
+    def get_season_year() -> int:
+        now = datetime.now()
+        current_year = int(now.year)
+        current_month = int(now.month)
+        return current_year+1 if current_month>=10 else current_year
+
