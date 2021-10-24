@@ -2,6 +2,7 @@
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 from PIL import Image
 from utils.export_utils import ExportUtils
 from utils.config import DATA_SOURCE_URL
@@ -22,7 +23,11 @@ st.markdown(
 st.sidebar.header("Filtering")
 selected_year = st.sidebar.selectbox(
     "Year",
-    list(reversed([str(year) + "-" + str(year + 1) for year in range(1980, DataUtils.get_season_year())])),
+    list(reversed(
+        [str(year) + "-" + str(year + 1)
+         for year in range(1980, DataUtils.get_season_year())
+         ]
+    )),
 )
 selected_category = st.sidebar.selectbox("Stats", ("Avg", "Total"))
 
@@ -48,15 +53,20 @@ def load_data(year: str, stat_type: str):
     )
     playerstats["FanPoints"] = DataUtils.calculate_fan_points(playerstats)
     playerstats.sort_values(["FanPoints"], ascending=False, inplace=True)
+    playerstats.insert(0, "rank", np.arange(start=1, stop=len(playerstats)+1))
     return playerstats
 
 
-playerstats = load_data(selected_year, DataUtils.get_stat_type(selected_category))
+playerstats = load_data(
+    selected_year, DataUtils.get_stat_type(selected_category)
+)
 
 # Sidebar - Player selection
 sorted_unique_players = sorted(playerstats.Player.unique())
 options = sorted_unique_players.append("All")
-selected_player = st.sidebar.multiselect("Player", sorted_unique_players, ["All"])
+selected_player = st.sidebar.multiselect(
+    "Player", sorted_unique_players, ["All"]
+)
 if "All" in selected_player:
     selected_player = sorted_unique_players
 
